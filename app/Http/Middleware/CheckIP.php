@@ -20,7 +20,7 @@ class CheckIP
 
         // Check if the IP is allowed
         if (!in_array($ip, $this->allowedIps)) {
-            return response()->file(public_path('uploads/all/capture.png'));
+            return response()->view('forbidden');
         }
 
         return $next($request);
