@@ -12,7 +12,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: #000;
+            background: #fff;
         }
         img {
             max-width: 100%;
