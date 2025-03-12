@@ -23,7 +23,7 @@
 </head>
 
 <body>
-    <img src="{{ asset('uploads/all/capture.png') }}" alt="Access Forbidden">
+    <img src="{{ asset('public/uploads/all/capture.png') }}" alt="Access Forbidden">
 </body>
 
 </html>
