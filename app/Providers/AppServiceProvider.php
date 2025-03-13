@@ -17,6 +17,10 @@ class AppServiceProvider extends ServiceProvider
   {
       Schema::defaultStringLength(191);
       Paginator::useBootstrap();
+
+      if ($this->app->environment('production')) { //force to ssl on production
+        URL::forceScheme('https');
+      }      
   }
 
   /**

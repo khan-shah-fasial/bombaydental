@@ -10,7 +10,7 @@ class CheckIP
 {
     // Allowed IPs list (you can add more IPs here)
     protected $allowedIps = [
-        '103.175.61.38',
+        '103.175.61.38', '127.0.0.1'
     ];
 
     public function handle(Request $request, Closure $next): Response
