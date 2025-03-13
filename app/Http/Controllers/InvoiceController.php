@@ -103,6 +103,17 @@ class InvoiceController extends Controller
 
         $order = Order::findOrFail($id);
         if (in_array(auth()->user()->user_type, ['admin','staff']) || in_array(auth()->id(), [$order->user_id, $order->seller_id])) {
+ 
+            if ((int) request()->stream === 1) { //added for stream
+                return PDF::loadView('backend.invoices.invoice', [
+                    'order' => $order,
+                    'font_family' => $font_family,
+                    'direction' => $direction,
+                    'text_align' => $text_align,
+                    'not_text_align' => $not_text_align
+                ], [], $config)->stream('order-' . $order->code . '.pdf');               
+            }
+
             return PDF::loadView('backend.invoices.invoice', [
                 'order' => $order,
                 'font_family' => $font_family,

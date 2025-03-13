@@ -25,11 +25,11 @@
         <table class="table aiz-table mb-0">
             <thead>
                 <tr>
-                    <th data-breakpoints="lg" width="10%">#</th>
+                    <th data-breakpoints="" width="10%">#</th>
                     <th>{{translate('Name')}}</th>
-                    <th data-breakpoints="lg">{{translate('Email')}}</th>
-                    <th data-breakpoints="lg">{{translate('Phone')}}</th>
-                    <th data-breakpoints="lg">{{translate('Role')}}</th>
+                    <th data-breakpoints="">{{translate('Email')}}</th>
+                    <th data-breakpoints="">{{translate('Phone')}}</th>
+                    <th data-breakpoints="">{{translate('Role')}}</th>
                     <th width="10%" class="text-right">{{translate('Options')}}</th>
                 </tr>
             </thead>

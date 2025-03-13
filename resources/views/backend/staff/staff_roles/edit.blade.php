@@ -36,10 +36,21 @@
                 @php
                     $permission_groups =  \App\Models\Permission::all()->groupBy('section');
                     $addons = array("offline_payment", "club_point", "pos_system", "paytm", "seller_subscription", "otp_system", "refund_request", "affiliate_system", "african_pg", "delivery_boy", "auction", "wholesale");
+
+                    // List of sections to hide
+                    $hidden_sections = [
+                        'Note', 'Product Warranty', 'Notification', 
+                        'Size Guide', 'System', 'Website Setup', 'Blog', 'Seller'
+                    ];   
                 @endphp
                 @foreach ($permission_groups as $key => $permission_group)
                     @php
                         $show_permission_group = true;
+
+                        // Hide specific sections
+                        if (in_array(Str::headline($permission_group[0]['section']), $hidden_sections) && auth()->user()->user_type == "staff") {
+                            $show_permission_group = false;
+                        }                        
                         
                         if(in_array($permission_group[0]['section'], $addons)){
 

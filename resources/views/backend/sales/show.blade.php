@@ -325,7 +325,9 @@
                     </tbody>
                 </table>
                 <div class="no-print text-right">
-                    <a href="{{ route('invoice.download', $order->id) }}" type="button" class="btn btn-icon btn-light"><i
+                    {{--<a href="{{ route('invoice.download', $order->id) }}" type="button" class="btn btn-icon btn-light"><i
+                            class="las la-print"></i></a>--}}
+                    <a target="_blank" href="{{ route('invoice.download', ['order_id' => $order->id, 'stream' => 1]) }}" type="button" class="btn btn-icon btn-light"><i
                             class="las la-print"></i></a>
                 </div>
             </div>

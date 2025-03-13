@@ -18,7 +18,7 @@
 <p>
     <span class="bg-danger d-inline-block h-10px rounded-2 w-10px" ></span> {{ translate('This color indicates that the customer is marked as blocked.') }}
     <br>
-    <span class="bg-info d-inline-block h-10px rounded-2 w-10px"></span> {{ translate('This color indicates that the customer is marked as suspicious.') }}
+    {{--<span class="bg-info d-inline-block h-10px rounded-2 w-10px"></span> {{ translate('This color indicates that the customer is marked as suspicious.') }}--}}
 </p>
 
 <div class="card">
@@ -65,11 +65,12 @@
                             </div>
                         </th>
                         <th>{{translate('Name')}}</th>
-                        <th data-breakpoints="lg">{{translate('Email Address')}}</th>
-                        <th data-breakpoints="lg">{{translate('Phone')}}</th>
-                        <th data-breakpoints="lg">{{translate('Package')}}</th>
-                        <th data-breakpoints="lg">{{translate('Wallet Balance')}}</th>
-                        <th data-breakpoints="lg">{{translate('Verification Status')}}</th>
+                        <th data-breakpoints="">{{translate('Email Address')}}</th>
+                        <th data-breakpoints="">{{translate('Phone')}}</th>
+                        {{--<th data-breakpoints="lg">{{translate('Package')}}</th>
+                        <th data-breakpoints="lg">{{translate('Wallet Balance')}}</th>--}}
+                        <th data-breakpoints="">{{translate('Verification Status')}}</th>
+                        <th data-breakpoints="">{{translate('Registration Date')}}</th>
                         <th class="text-right">{{translate('Options')}}</th>
                     </tr>
                 </thead>
@@ -98,12 +99,12 @@
                                     </p>
                                 <td>{{$user->email}}</td>
                                 <td>{{$user->phone}}</td>
-                                <td>
+                                {{--<td>
                                     @if ($user->customer_package != null)
                                         {{$user->customer_package->getTranslation('name')}}
                                     @endif
                                 </td>
-                                <td>{{single_price($user->balance)}}</td>
+                                <td>{{single_price($user->balance)}}</td>--}}
                                 <td>
                                     @if($user->email_verified_at != null)
                                         <span class="badge badge-inline badge-success">{{translate('Verified')}}</span>
@@ -111,6 +112,7 @@
                                         <span class="badge badge-inline badge-warning">{{translate('Unverified')}}</span>
                                     @endif
                                 </td>
+                                <td>{{ date('d-m-Y h:i A', strtotime($user->created_at)) }}</td>
                                 <td class="text-right">
                                     @if($user->email_verified_at != null && auth()->user()->can('login_as_customer'))
                                         <a href="{{route('customers.login', encrypt($user->id))}}" class="btn btn-soft-primary btn-icon btn-circle btn-sm" title="{{ translate('Log in as this Customer') }}">

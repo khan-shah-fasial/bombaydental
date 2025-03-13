@@ -214,7 +214,7 @@
             <div class="col-lg-6">
                 <div class="row gutters-16">
                     <!-- Total Sales -->
-                    <div class="col-sm-6">
+                    <div class="col-sm-12">
                         <div class="dashboard-box bg-soft-primary mb-2rem overflow-hidden" style="height: 470px;">
                             <div class="d-flex flex-column justify-content-between h-100">
                                 <!-- Total Sales -->
@@ -269,7 +269,7 @@
                     </div>
 
                     <!-- Total Sellers -->
-                    <div class="col-sm-6">
+                    {{--<div class="col-sm-6">
                         <div class="dashboard-box bg-white mb-2rem overflow-hidden" style="height: 470px;">
                             @if (get_setting('vendor_system_activation') == 1)
                                 <div class="d-flex flex-column justify-content-between h-100">
@@ -341,7 +341,7 @@
                                 </div>
                             @endif
                         </div>
-                    </div>
+                    </div>--}}
                 </div>
             </div>
 
