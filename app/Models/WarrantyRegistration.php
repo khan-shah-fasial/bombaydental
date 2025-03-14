@@ -9,7 +9,7 @@ class WarrantyRegistration extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_id', 'serial_no', 'bill_image', 'date_of_purchase', 'status'];
+    protected $fillable = ['product_id', 'serial_no', 'bill_image', 'date_of_purchase', 'note', 'status'];
 
     public function product()
     {

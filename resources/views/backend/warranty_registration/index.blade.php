@@ -23,77 +23,131 @@
                 <h5 class="mb-md-0 h6">{{ translate('All Warranty Registrations') }}</h5>
             </div>
 
-            @can('warranty_delete')
-                <div class="dropdown mb-2 mb-md-0">
-                    <button class="btn border dropdown-toggle" type="button" data-toggle="dropdown">
-                        {{ translate('Bulk Action') }}
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item confirm-alert" href="javascript:void(0)" data-target="#bulk-delete-modal">{{ translate('Delete selection') }}</a>
-                    </div>
-                </div>
-            @endcan
-
-            <div class="col-md-2">
-                <select class="form-control form-control-sm aiz-selectpicker mb-2 mb-md-0" name="type" id="type" onchange="sort_warranties()">
-                    <option value="">{{ translate('Sort By') }}</option>
-                    <option value="created_at,desc" @if(request('type') == 'created_at,desc') selected @endif>{{ translate('Newest First') }}</option>
-                    <option value="created_at,asc" @if(request('type') == 'created_at,asc') selected @endif>{{ translate('Oldest First') }}</option>
-                </select>
-            </div>
-
             <div class="col-md-2">
                 <div class="form-group mb-0">
                     <input type="text" class="form-control form-control-sm" id="search" name="search" value="{{ request('search') }}" placeholder="{{ translate('Type & Enter') }}">
                 </div>
             </div>
         </div>
+    </form>
 
-        <div class="card-body">
-            <table class="table aiz-table mb-0">
-                <thead class="text-gray fs-12">
+    <div class="card-body">
+        <table class="table aiz-table mb-0">
+            <thead class="text-gray fs-12">
+                <tr>
+                    <th>{{ translate('Product Name') }}</th>
+                    <th>{{ translate('Serial No') }}</th>
+                    <th>{{ translate('Date Of Purchase') }}</th>
+                    <th>{{ translate('Bill Image') }}</th>
+                    <th>{{ translate('Status') }}</th>
+                    <th class="text-right">{{ translate('Options') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($warranties as $registration)
                     <tr>
-                        <th>{{ translate('Product Name') }}</th>
-                        <th>{{ translate('Serial No') }}</th>
-                        <th>{{ translate('Date Of Purchase') }}</th>
-                        <th>{{ translate('Bill Image') }}</th>
-                        <th>{{ translate('Status') }}</th>
-                        <th class="text-right">{{ translate('Options') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($warranties as $registration)
-                        <tr>
-                            <td>{{ $registration->product->name ?? 'N/A' }}</td>
-                            <td>{{ $registration->serial_no }}</td>
-                            <td>{{ date('d-m-Y', strtotime($registration->date_of_purchase)) }}</td>
-                            <td>
-                                @if($registration->bill_image)
-                                    <a href="{{ asset($registration->bill_image) }}" target="_blank">
-                                        <img src="{{ asset($registration->bill_image) }}" alt="Bill Image" width="50" height="50" class="img-thumbnail">
+                        <td>{{ $registration->product->name ?? 'N/A' }}</td>
+                        <td>{{ $registration->serial_no }}</td>
+                        <td>{{ date('d-m-Y', strtotime($registration->date_of_purchase)) }}</td>
+                        <td>
+                            @if($registration->bill_image)
+                                <a href="{{ asset($registration->bill_image) }}" target="_blank">
+                                    <img src="{{ asset($registration->bill_image) }}" alt="Bill Image" width="50" height="50" class="img-thumbnail">
+                                </a>
+                            @else
+                                {{ translate('No Image') }}
+                            @endif
+                        </td>
+                        <td>{{ $registration->status ? translate('Approved') : translate('Pending') }}</td>
+                        <td class="text-right">
+                            @can('ban_customer')
+                                @if ($registration->status != 1)
+                                    <a href="#" class="btn btn-soft-success btn-sm"
+                                        onclick="show_Approval_model({{ $registration->id }}, 'approve');"
+                                        title="{{ translate('Approval') }}">
+                                        Approve
                                     </a>
                                 @else
-                                    {{ translate('No Image') }}
+                                    <a href="#" class="btn btn-soft-danger btn-sm"
+                                        onclick="show_Approval_model({{ $registration->id }}, 'not_approve');"
+                                        title="{{ translate('Not Approve') }}">
+                                        Not Approve
+                                    </a>
                                 @endif
-                            </td>
-                            <td>{{ $registration->status ? translate('Approved') : translate('Pending') }}</td>
-                            <td class="text-right">
-                                <a href="{{ route('warranty_registration.details', $registration->id) }}" class="btn btn-soft-info btn-sm">{{ translate('View') }}</a>
-                                @can('warranty_delete')
-                                    <a href="javascript:void(0)" class="btn btn-soft-danger btn-sm confirm-delete" data-href="{{ route('warranty_registration_admin.destroy', $registration->id) }}">{{ translate('Cancel') }}</a>
-                                @endcan
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                            @endcan
+                            @can('warranty_delete')
+                                <a href="javascript:void(0)" class="btn btn-soft-danger btn-sm confirm-delete" data-href="{{ route('warranty_registration_admin.destroy', $registration->id) }}">{{ translate('Cancel') }}</a>
+                            @endcan
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
 
-            <div class="aiz-pagination">
-                {{ $warranties->appends(request()->input())->links() }}
-            </div>
+        <div class="aiz-pagination">
+            {{ $warranties->appends(request()->input())->links() }}
         </div>
-    </form>
+    </div>
+
+
 </div>
+
+
+
+{{-- - //------------------------------ approval modal -----------------------// -- --}}
+
+<div class="modal fade" id="approval_model" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel_phone"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content py-3">
+            <div class="modal-header">
+                <div class="heading">
+                    <h5 class="modal-title" id="exampleModalLabel_phone">Approval Statusr</h5>
+                </div>
+                <div class="purple_btn_close">
+                    <button type="button" class="close p-1 px-3" data-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+            </div>
+            <form id="approval-status-model" action="{{ url(route('warranty_registration.update_status')) }}" method="post">
+                @csrf
+
+                <input type="hidden" name="id">
+
+                <!-- Approval Status Dropdown -->
+                <div class="form-group">
+                    <label for="approval-status" class="modal-body col-form-label form-label">Approval Status:</label>
+                    <select class="form-control" id="approval-status" name="approval_status"
+                        onchange="toggleNote()">
+                        <option value="approve">Approve</option>
+                        <option value="not_approve">Not Approve</option>
+                    </select>
+                </div>
+
+                <div id="note-section" style="display: none;" class="modal-body">
+                    <div class="form-group">
+                        <label for="recipient-name" class="col-form-label form-label">Note :</label>
+                        <textarea type="text" class="form-control" id="note" name="note"></textarea>
+                    </div>
+                </div>
+
+
+                <div class="modal-footer">
+                    <div class="blue_btn">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                    <div class="purple_btn">
+                        <button type="submit" class="btn btn-primary">Proceed</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- - //------------------------------ approval modal -----------------------// -- --}}
+
+
 
 @endsection
 
@@ -108,114 +162,30 @@
 @section('script')
     <script type="text/javascript">
 
-        $(document).on("change", ".check-all", function() {
-            if(this.checked) {
-                // Iterate each checkbox
-                $('.check-one:checkbox').each(function() {
-                    this.checked = true;
-                });
+        function toggleNote() {
+            const approvalStatus = document.getElementById('approval-status').value;
+            const noteSection = document.getElementById('note-section');
+
+            if (approvalStatus === 'not_approve') {
+                noteSection.style.display = 'block'; // Show the note section
             } else {
-                $('.check-one:checkbox').each(function() {
-                    this.checked = false;
-                });
+                noteSection.style.display = 'none'; // Hide the note section
             }
-
-        });
-
-        // function update_published(el){
-
-        //     if('{{env('DEMO_MODE')}}' == 'On'){
-        //         AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
-        //         return;
-        //     }
-
-        //     if(el.checked){
-        //         var status = 1;
-        //     }
-        //     else{
-        //         var status = 0;
-        //     }
-        //     $.post('{{ route('products.published') }}', {_token:'{{ csrf_token() }}', id:el.value, status:status}, function(data){
-        //         if(data == 1){
-        //             AIZ.plugins.notify('success', '{{ translate('Published products updated successfully') }}');
-        //         }
-        //         else{
-        //             AIZ.plugins.notify('danger', '{{ translate('Something went wrong') }}');
-        //         }
-        //     });
-        // }
-
-        function update_approved(el){
-
-            if('{{env('DEMO_MODE')}}' == 'On'){
-                AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
-                return;
-            }
-
-            if(el.checked){
-                var approved = 1;
-            }
-            else{
-                var approved = 0;
-            }
-            $.post('{{ route('products.approved') }}', {
-                _token      :   '{{ csrf_token() }}',
-                id          :   el.value,
-                approved    :   approved
-            }, function(data){
-                if(data == 1){
-                    AIZ.plugins.notify('success', '{{ translate('Product approval update successfully') }}');
-                }
-                else{
-                    AIZ.plugins.notify('danger', '{{ translate('Something went wrong') }}');
-                }
-            });
         }
 
-        // function update_featured(el){
-        //     if('{{env('DEMO_MODE')}}' == 'On'){
-        //         AIZ.plugins.notify('info', '{{ translate('Data can not change in demo mode.') }}');
-        //         return;
-        //     }
 
-        //     if(el.checked){
-        //         var status = 1;
-        //     }
-        //     else{
-        //         var status = 0;
-        //     }
-        //     $.post('{{ route('products.featured') }}', {_token:'{{ csrf_token() }}', id:el.value, status:status}, function(data){
-        //         if(data == 1){
-        //             AIZ.plugins.notify('success', '{{ translate('Featured products updated successfully') }}');
-        //         }
-        //         else{
-        //             AIZ.plugins.notify('danger', '{{ translate('Something went wrong') }}');
-        //         }
-        //     });
-        // }
+        // // Global scope
+        function show_Approval_model(id, status, role) {
+            // // Set the value of the hidden input field
+            $('#approval_model input[name="id"]').val(id);
 
-        function sort_products(el){
-            $('#sort_products').submit();
-        }
+            // Set the selected option in the dropdown
+            $('#approval-status').val(status);
 
-        function bulk_delete() {
-            var data = new FormData($('#sort_products')[0]);
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                url: "{{route('bulk-product-delete')}}",
-                type: 'POST',
-                data: data,
-                cache: false,
-                contentType: false,
-                processData: false,
-                success: function (response) {
-                    if(response == 1) {
-                        location.reload();
-                    }
-                }
-            });
+            toggleNote();
+
+            // Show the modal
+            $('#approval_model').modal('show');
         }
 
     </script>

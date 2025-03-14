@@ -273,4 +273,46 @@ class EmailUtility
         }
     }
 
+
+    // Not Approval Email 
+    public static function warranty_reject_email($user){
+        $emailSendTo = $user->email;
+        $emailSubject = 'Your Warranty Has Not Been Approved by Admin';
+        $emailBody = 'Reason for not approval: '. nl2br($user->note);
+
+        $array['subject'] = $emailSubject;
+        $array['content'] = $emailBody;
+
+        // Mail::to($emailSendTo)->queue(new MailManager($array));
+        // $array = ['subject' => $emailSubject, 'content' => $emailBody];
+        // $emailHtml = (new MailManager($array))->render();
+    
+        // sendEmail($emailSendTo, $emailSubject, $emailHtml);
+
+        try {
+            Mail::to($emailSendTo)->queue(new MailManager($array));
+        } catch (\Exception $e) {}
+    }
+
+
+    // Approval Email 
+    public static function warranty_approval_email($user){
+        $emailSendTo = $user->email;
+        $emailSubject = 'Your Warranty Has Been Approved by Admin';
+        $emailBody = 'Your Warranty Has Been Approved.';
+        
+        $array['subject'] = $emailSubject;
+        $array['content'] = $emailBody;
+
+        // Mail::to($emailSendTo)->queue(new MailManager($array));
+        // $array = ['subject' => $emailSubject, 'content' => $emailBody];
+        // $emailHtml = (new MailManager($array))->render();
+    
+        // sendEmail($emailSendTo, $emailSubject, $emailHtml);
+
+        try {
+            Mail::to($emailSendTo)->queue(new MailManager($array));
+        } catch (\Exception $e) {}
+    }
+
 }

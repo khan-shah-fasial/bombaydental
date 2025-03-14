@@ -304,8 +304,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::get('/warranty-registrations-admin/destroy/{id}', 'warranty_registration_cancel_admin')->name('warranty_registration_admin.destroy');
         Route::get('/warranty-registration', 'warranty_registration_index_admin')->name('warranty_registration_admin.index');
 
-        Route::get('/warranty_registration/{id}/status', [WarrantyRegistrationController::class, 'get_status'])->name('warranty_registration.status');
-        Route::put('/warranty-registration-status/{id}', [WarrantyRegistrationController::class, 'update_status'])->name('warranty_registration.update_status');
+        Route::post('/warranty-registration-status/', [WarrantyRegistrationController::class, 'approval'])->name('warranty_registration.update_status');
     });
 
 

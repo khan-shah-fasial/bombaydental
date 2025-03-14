@@ -23,9 +23,7 @@ class WarrantyRegistrationController extends Controller
 
     public function warranty_registration_index_admin(Request $request)
     {
-        $col_name = null;
         $query = null;
-        $sort_search = null;
 
         $warranties = WarrantyRegistration::query();
 
@@ -39,21 +37,10 @@ class WarrantyRegistrationController extends Controller
             });
         }
 
-        // Apply sorting
-        if ($request->type != null) {
-            $var = explode(",", $request->type);
-            $col_name = $var[0];
-            $query = $var[1];
-            $warranties->orderBy($col_name, $query);
-            $sort_type = $request->type;
-        }
-
         // Default sorting by newest first
         $warranties = $warranties->orderBy('created_at', 'desc')->paginate(15);
 
-        $type = 'All';
-
-        return view('backend.warranty_registration.index', compact('warranties', 'type', 'col_name', 'query', 'sort_search'));
+        return view('backend.warranty_registration.index', compact('warranties', 'query'));
     }
 
     public function warranty_registration_store(Request $request)
@@ -179,5 +166,32 @@ class WarrantyRegistrationController extends Controller
             'status' => 'success',
             'message' => 'Warranty Registration updated successfully!',
         ], 200);
+    }
+
+
+    public function approval(Request $request)
+    {
+        $registration = WarrantyRegistration::findOrFail($request->id);
+
+        $status = ($request->approval_status == 'approve') ? 1 : 0;
+
+        $registration->status = $status;
+        $registration->note = $request->note;
+
+        $registration->save();
+
+        try {
+            if ($status == 1) {
+                EmailUtility::warranty_approval_email($registration);
+                flash(translate('Warranty Approved Successfully'))->success();
+            } else {
+                EmailUtility::warranty_reject_email($registration);
+                flash(translate('Warranty Rejected Successfully'))->success();
+            }
+        } catch (\Exception $e) {
+            flash(translate('Email sending failed'))->error();
+        }
+
+        return back();
     }
 }
