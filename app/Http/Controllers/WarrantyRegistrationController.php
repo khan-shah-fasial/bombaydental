@@ -1,0 +1,183 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\WarrantyRegistration;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Validator;
+use App\Utility\EmailUtility;
+use DB;
+
+class WarrantyRegistrationController extends Controller
+{
+    // Display the warranty registration history
+    public function warranty_registration_index()
+    {
+        $warranty_registration = WarrantyRegistration::with('product')->paginate(10);
+        $products = Product::all();
+        return view('frontend.user.warranty_registration.index', compact('warranty_registration', 'products'));
+    }
+
+    public function warranty_registration_index_admin(Request $request)
+    {
+        $col_name = null;
+        $query = null;
+        $sort_search = null;
+
+        $warranties = WarrantyRegistration::query();
+
+        // Search by product name, serial number, or SKU
+        if ($request->search != null) {
+            $sort_search = $request->search;
+            $warranties->where(function ($query) use ($sort_search) {
+                $query->whereHas('product', function ($q) use ($sort_search) {
+                    $q->where('name', 'like', '%' . $sort_search . '%');
+                })->orWhere('serial_no', 'like', '%' . $sort_search . '%');
+            });
+        }
+
+        // Apply sorting
+        if ($request->type != null) {
+            $var = explode(",", $request->type);
+            $col_name = $var[0];
+            $query = $var[1];
+            $warranties->orderBy($col_name, $query);
+            $sort_type = $request->type;
+        }
+
+        // Default sorting by newest first
+        $warranties = $warranties->orderBy('created_at', 'desc')->paginate(15);
+
+        $type = 'All';
+
+        return view('backend.warranty_registration.index', compact('warranties', 'type', 'col_name', 'query', 'sort_search'));
+    }
+
+    public function warranty_registration_store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|exists:products,id',
+            'serial_no' => 'required|string|unique:warranty_registrations',
+            'date_of_purchase' => 'required|date',
+            'bill_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        // Handle validation failure
+        if ($validator->fails()) {
+            $errors = $validator->errors()->all();
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $errors
+            ], 200);
+        }
+
+        // Ensure the directory exists
+        $billImagePath = public_path('uploads/bill_img');
+        if (!File::exists($billImagePath)) {
+            File::makeDirectory($billImagePath, 0777, true);
+        }
+
+        // Move the uploaded file to public/uploads/bill_img
+        $bill_image_name = time() . '_' . $request->file('bill_image')->getClientOriginalName();
+        $request->file('bill_image')->move($billImagePath, $bill_image_name);
+
+        WarrantyRegistration::create([
+            'product_id' => $request->product_id,
+            'serial_no' => $request->serial_no,
+            'date_of_purchase' => $request->date_of_purchase,
+            'bill_image' => 'uploads/bill_img/' . $bill_image_name,
+            'status' => 0, // Pending approval
+        ]);
+
+        
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Warranty registration submitted!',
+        ], 200);
+    }
+
+    // Cancel (Delete) warranty registration
+    public function warranty_registration_cancel($id)
+    {
+        $warranty = WarrantyRegistration::findOrFail($id);
+        $warranty->delete();
+
+        return redirect()->route('warranty_registration_history.index')
+                         ->with('success', 'Warranty registration has been canceled.');
+    }
+
+    public function warranty_registration_cancel_admin($id)
+    {
+        $warranty = WarrantyRegistration::findOrFail($id);
+        $warranty->delete();
+
+        flash(translate('Warranty registration has been canceled'))->success();
+
+        return redirect()->route('warranty_registration_admin.index');
+    }
+
+
+    public function edit($id)
+    {
+        $registration = WarrantyRegistration::findOrFail($id);
+        return response()->json($registration);
+    }
+
+
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|exists:products,id',
+            'serial_no' => 'required|string|unique:warranty_registrations,serial_no,' . $id,
+            'date_of_purchase' => 'required|date',
+            'bill_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        // Handle validation failure
+        if ($validator->fails()) {
+            $errors = $validator->errors()->all();
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $errors
+            ], 200);
+        }
+
+        $registration = WarrantyRegistration::findOrFail($id);
+
+        // Update fields
+        $registration->product_id = $request->product_id;
+        $registration->serial_no = $request->serial_no;
+        $registration->date_of_purchase = $request->date_of_purchase;
+
+        // Handle image upload (if provided)
+        if ($request->hasFile('bill_image')) {
+            // Ensure the upload folder exists
+            $uploadPath = public_path('uploads/bill_img');
+            if (!File::exists($uploadPath)) {
+                File::makeDirectory($uploadPath, 0777, true);
+            }
+
+            // Delete old image if exists
+            if ($registration->bill_image && File::exists($uploadPath . '/' . $registration->bill_image)) {
+                File::delete($uploadPath . '/' . $registration->bill_image);
+            }
+
+            // Store new image
+            $imageName = time() . '_' . $request->file('bill_image')->getClientOriginalName();
+            $request->file('bill_image')->move($uploadPath, $imageName);
+            $registration->bill_image = $imageName;
+        }
+
+        $registration->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Warranty Registration updated successfully!',
+        ], 200);
+    }
+}

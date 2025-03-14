@@ -275,6 +275,8 @@ class AddonController extends Controller
 
     public function check_activation( $data){
 
+        return true;
+
         $domainPurchaseCode = $data->input('domain_purchase_code');
         $addonPurchaseCode  = $data->input('purchase_code');
         

@@ -57,6 +57,8 @@ use App\Http\Controllers\WarrantyController;
 use App\Http\Controllers\WebsiteController;
 use App\Http\Controllers\ZoneController;
 
+use App\Http\Controllers\WarrantyRegistrationController;
+
 /*
   |--------------------------------------------------------------------------
   | Admin Routes
@@ -293,6 +295,17 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
 
         // Order Configuration
         Route::get('/order-configuration', 'order_configuration')->name('order_configuration.index');
+    });
+
+
+
+    Route::controller(WarrantyRegistrationController::class)->group(function () {
+
+        Route::get('/warranty-registrations-admin/destroy/{id}', 'warranty_registration_cancel_admin')->name('warranty_registration_admin.destroy');
+        Route::get('/warranty-registration', 'warranty_registration_index_admin')->name('warranty_registration_admin.index');
+
+        Route::get('/warranty_registration/{id}/status', [WarrantyRegistrationController::class, 'get_status'])->name('warranty_registration.status');
+        Route::put('/warranty-registration-status/{id}', [WarrantyRegistrationController::class, 'update_status'])->name('warranty_registration.update_status');
     });
 
 

@@ -132,6 +132,11 @@
                                 </a>
                             </li>
                             @endcan
+                            <li class="aiz-side-nav-item">
+                                <a href="{{route('warranty_registration_admin.index')}}" class="aiz-side-nav-link">
+                                    <span class="aiz-side-nav-text">{{ translate('Warranty Registration') }}</span>
+                                </a>
+                            </li>
                             @can('show_in_house_products')
                             <li class="aiz-side-nav-item">
                                 <a href="{{route('products.admin')}}"

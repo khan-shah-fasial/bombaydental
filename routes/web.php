@@ -51,6 +51,8 @@ use App\Http\Controllers\WalletController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\SizeChartController;
 
+use App\Http\Controllers\WarrantyRegistrationController;
+
 /*
   |--------------------------------------------------------------------------
   | Web Routes
@@ -76,6 +78,10 @@ Route::controller(DemoController::class)->group(function () {
 
 Route::get('/refresh-csrf', function () {
     return csrf_token();
+});
+
+Route::get('/csrf-token', function () {
+    return response()->json(['token' => csrf_token()]);
 });
 
 // AIZ Uploader
@@ -304,6 +310,19 @@ Route::group(['middleware' => ['customer', 'verified', 'unbanned']], function ()
 
         Route::get('/re-order/{id}', 're_order')->name('re_order');
     });
+
+
+    Route::controller(WarrantyRegistrationController::class)->group(function () {
+        Route::get('/warranty-registration/details/{id}', 'warranty_registration_details')->name('warranty_registration.details');
+        Route::get('/warranty-registration/destroy/{id}', 'warranty_registration_cancel')->name('warranty_registration.destroy');
+        Route::get('/warranty-registration-history', 'warranty_registration_index')->name('warranty_registration_history.index');
+        Route::post('/warranty-registration/store', 'warranty_registration_store')->name('warranty_registration.store');
+
+
+        Route::get('/warranty_registration/{id}/edit', [WarrantyRegistrationController::class, 'edit'])->name('warranty_registration.edit');
+        Route::put('/warranty_registration/{id}', [WarrantyRegistrationController::class, 'update'])->name('warranty_registration.update');
+    });
+
 
     // Wishlist
     Route::resource('wishlists', WishlistController::class);
