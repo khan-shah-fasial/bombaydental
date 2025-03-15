@@ -86,8 +86,10 @@ class WarrantyRegistrationController extends Controller
             File::makeDirectory($billImagePath, 0777, true);
         }
 
+        // Replace spaces with hyphens in the file name
+        $bill_image_name = time() . '_' . str_replace(' ', '-', $request->file('bill_image')->getClientOriginalName());
+
         // Move the uploaded file to public/uploads/bill_img
-        $bill_image_name = time() . '_' . $request->file('bill_image')->getClientOriginalName();
         $request->file('bill_image')->move($billImagePath, $bill_image_name);
 
         WarrantyRegistration::create([
@@ -168,14 +170,16 @@ class WarrantyRegistrationController extends Controller
             if (!File::exists($uploadPath)) {
                 File::makeDirectory($uploadPath, 0777, true);
             }
-
-            // Delete old image if exists
+        
+            // Delete old image if it exists
             if ($registration->bill_image && File::exists($uploadPath . '/' . $registration->bill_image)) {
                 File::delete($uploadPath . '/' . $registration->bill_image);
             }
-
+        
+            // Replace spaces with hyphens in the file name
+            $imageName = time() . '_' . str_replace(' ', '-', $request->file('bill_image')->getClientOriginalName());
+        
             // Store new image
-            $imageName = time() . '_' . $request->file('bill_image')->getClientOriginalName();
             $request->file('bill_image')->move($uploadPath, $imageName);
             $registration->bill_image = $imageName;
         }
