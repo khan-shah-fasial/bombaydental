@@ -3013,3 +3013,12 @@ function filter_single_preorder_product($product)
     // If vendor system is not activated, return the product directly
     return $product;
 }
+
+function custom_file($url)
+{
+    if(app()->environment('local')){
+        return $url;
+    }
+
+    return 'public/' . $url;
+}

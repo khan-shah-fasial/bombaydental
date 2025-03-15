@@ -68,11 +68,11 @@
                                         @endphp
                                     
                                         @if(in_array(strtolower($fileExtension), $imageExtensions))
-                                            <a href="{{ asset($order->bill_image) }}" target="_blank">
-                                                <img src="{{ asset($order->bill_image) }}" alt="Bill Image" width="50" height="50" class="img-thumbnail">
+                                            <a href="{{ asset(custom_file($order->bill_image)) }}" target="_blank">
+                                                <img src="{{ asset(custom_file($order->bill_image)) }}" alt="Bill Image" width="50" height="50" class="img-thumbnail">
                                             </a>
                                         @else
-                                            <a href="{{ asset($order->bill_image) }}" target="_blank">View PDF</a>
+                                            <a href="{{ asset(custom_file($order->bill_image)) }}" target="_blank">View PDF</a>
                                         @endif
                                     @else
                                         No File
