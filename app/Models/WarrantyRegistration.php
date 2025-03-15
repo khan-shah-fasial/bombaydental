@@ -9,10 +9,15 @@ class WarrantyRegistration extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['product_id', 'serial_no', 'bill_image', 'date_of_purchase', 'note', 'status'];
+    protected $fillable = ['product_id', 'user_id', 'serial_no', 'bill_image', 'date_of_purchase', 'note', 'status'];
 
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

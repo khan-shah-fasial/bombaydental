@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Validator;
 use App\Utility\EmailUtility;
+use Illuminate\Support\Facades\Auth;
 use DB;
 
 class WarrantyRegistrationController extends Controller
@@ -16,7 +17,9 @@ class WarrantyRegistrationController extends Controller
     // Display the warranty registration history
     public function warranty_registration_index()
     {
-        $warranty_registration = WarrantyRegistration::with('product')->paginate(10);
+        $warranty_registration = WarrantyRegistration::with('product')
+        ->where('user_id', Auth::id())
+        ->paginate(10);
         $products = Product::all();
         return view('frontend.user.warranty_registration.index', compact('warranty_registration', 'products'));
     }
@@ -34,6 +37,12 @@ class WarrantyRegistrationController extends Controller
                 $query->whereHas('product', function ($q) use ($sort_search) {
                     $q->where('name', 'like', '%' . $sort_search . '%');
                 })->orWhere('serial_no', 'like', '%' . $sort_search . '%');
+
+
+                // Also filter by user name if provided
+                $query->orWhereHas('user', function ($q) use ($sort_search) {
+                    $q->where('name', 'like', '%' . $sort_search . '%'); // Assuming 'name' is the column in users table
+                });
             });
         }
 
@@ -83,6 +92,7 @@ class WarrantyRegistrationController extends Controller
 
         WarrantyRegistration::create([
             'product_id' => $request->product_id,
+            'user_id' => auth()->user()->id,
             'serial_no' => $request->serial_no,
             'date_of_purchase' => $request->date_of_purchase,
             'bill_image' => 'uploads/bill_img/' . $bill_image_name,
@@ -147,6 +157,7 @@ class WarrantyRegistrationController extends Controller
 
         // Update fields
         $registration->product_id = $request->product_id;
+        $registration->user_id = auth()->user()->id;
         $registration->serial_no = $request->serial_no;
         $registration->date_of_purchase = $request->date_of_purchase;
 

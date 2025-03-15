@@ -61,6 +61,7 @@
         <table class="table aiz-table mb-0">
             <thead class="text-gray fs-12">
                 <tr>
+                    <th>{{ translate('User Name') }}</th>
                     <th>{{ translate('Product Name') }}</th>
                     <th>{{ translate('Serial No') }}</th>
                     <th>{{ translate('Date Of Purchase') }}</th>
@@ -72,6 +73,7 @@
             <tbody>
                 @foreach ($warranties as $registration)
                     <tr>
+                        <td>{{ $registration->user->name ?? 'N/A' }}</td>
                         <td>{{ $registration->product->name ?? 'N/A' }}</td>
                         <td>{{ $registration->serial_no }}</td>
                         <td>{{ date('d-m-Y', strtotime($registration->date_of_purchase)) }}</td>
