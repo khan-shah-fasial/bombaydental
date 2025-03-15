@@ -25,7 +25,33 @@
 
             <div class="col-md-2">
                 <div class="form-group mb-0">
+                    <label for="date_from" class="form-label">{{ translate('Search') }}</label>
                     <input type="text" class="form-control form-control-sm" id="search" name="search" value="{{ request('search') }}" placeholder="{{ translate('Type & Enter') }}">
+                </div>
+            </div>
+            <!-- From Date -->
+            <div class="col-md-2">
+                <div class="form-group mb-0">
+                    <label for="date_from" class="form-label">{{ translate('From Date') }}</label>
+                    <input type="date" class="form-control form-control-sm" id="date_from" name="date_from" value="{{ request('date_from') }}">
+                </div>
+            </div>
+
+            <!-- To Date -->
+            <div class="col-md-2">
+                <div class="form-group mb-0">
+                    <label for="date_from" class="form-label">{{ translate('To Date') }}</label>
+                    <input type="date" class="form-control form-control-sm" id="date_to" name="date_to" value="{{ request('date_to') }}">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group mb-0 d-flex">
+                    <button type="submit" class="btn btn-primary btn-sm me-2 mx-1">
+                        <i class="las la-search"></i> {{ translate('Search') }}
+                    </button>
+                    <a href="{{ url()->current() }}" class="btn btn-secondary btn-sm">
+                        <i class="las la-sync"></i> {{ translate('Reset') }}
+                    </a>
                 </div>
             </div>
         </div>
@@ -51,11 +77,20 @@
                         <td>{{ date('d-m-Y', strtotime($registration->date_of_purchase)) }}</td>
                         <td>
                             @if($registration->bill_image)
-                                <a href="{{ asset($registration->bill_image) }}" target="_blank">
-                                    <img src="{{ asset($registration->bill_image) }}" alt="Bill Image" width="50" height="50" class="img-thumbnail">
-                                </a>
+                                @php
+                                    $fileExtension = pathinfo($registration->bill_image, PATHINFO_EXTENSION);
+                                    $imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+                                @endphp
+                            
+                                @if(in_array(strtolower($fileExtension), $imageExtensions))
+                                    <a href="{{ asset($registration->bill_image) }}" target="_blank">
+                                        <img src="{{ asset($registration->bill_image) }}" alt="Bill Image" width="50" height="50" class="img-thumbnail">
+                                    </a>
+                                @else
+                                    <a href="{{ asset($registration->bill_image) }}" target="_blank">View PDF</a>
+                                @endif
                             @else
-                                {{ translate('No Image') }}
+                                No File
                             @endif
                         </td>
                         <td>{{ $registration->status ? translate('Approved') : translate('Pending') }}</td>
@@ -102,7 +137,7 @@
         <div class="modal-content py-3">
             <div class="modal-header">
                 <div class="heading">
-                    <h5 class="modal-title" id="exampleModalLabel_phone">Approval Statusr</h5>
+                    <h5 class="modal-title" id="exampleModalLabel_phone">Approval</h5>
                 </div>
                 <div class="purple_btn_close">
                     <button type="button" class="close p-1 px-3" data-dismiss="modal" aria-label="Close">

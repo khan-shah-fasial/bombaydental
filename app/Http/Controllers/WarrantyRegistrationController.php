@@ -37,6 +37,15 @@ class WarrantyRegistrationController extends Controller
             });
         }
 
+        // Search by date range
+        if ($request->date_from != null && $request->date_to != null) {
+            $warranties->whereBetween('date_of_purchase', [$request->date_from, $request->date_to]);
+        } elseif ($request->date_from != null) {
+            $warranties->whereDate('date_of_purchase', '>=', $request->date_from);
+        } elseif ($request->date_to != null) {
+            $warranties->whereDate('date_of_purchase', '<=', $request->date_to);
+        }
+
         // Default sorting by newest first
         $warranties = $warranties->orderBy('created_at', 'desc')->paginate(15);
 
@@ -49,7 +58,7 @@ class WarrantyRegistrationController extends Controller
             'product_id' => 'required|exists:products,id',
             'serial_no' => 'required|string|unique:warranty_registrations',
             'date_of_purchase' => 'required|date',
-            'bill_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'bill_image' => 'required|mimes:jpeg,png,jpg,pdf|max:2048',
         ]);
 
         // Handle validation failure
@@ -121,7 +130,7 @@ class WarrantyRegistrationController extends Controller
             'product_id' => 'required|exists:products,id',
             'serial_no' => 'required|string|unique:warranty_registrations,serial_no,' . $id,
             'date_of_purchase' => 'required|date',
-            'bill_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'bill_image' => 'nullable|mimes:jpeg,png,jpg,pdf|max:2048',
         ]);
 
         // Handle validation failure

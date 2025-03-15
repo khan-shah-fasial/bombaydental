@@ -30,7 +30,7 @@
                     </div>
                     <div class="col-md-4 mt-3">
                         <label>Upload Bill Image:</label>
-                        <input type="file" name="bill_image" class="form-control" accept="image/*" required>
+                        <input type="file" name="bill_image" class="form-control" accept="image/*,application/pdf" required>
                     </div>
                     <div class="col-md-4 mt-3">
                         <button type="submit" class="btn btn-primary">Submit</button>
@@ -62,11 +62,20 @@
                                 </td>
                                 <td>
                                     @if($order->bill_image)
-                                        <a href="{{ asset($order->bill_image) }}" target="_blank">
-                                            <img src="{{ asset($order->bill_image) }}" alt="Bill Image" width="50" height="50" class="img-thumbnail">
-                                        </a>
+                                        @php
+                                            $fileExtension = pathinfo($order->bill_image, PATHINFO_EXTENSION);
+                                            $imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+                                        @endphp
+                                    
+                                        @if(in_array(strtolower($fileExtension), $imageExtensions))
+                                            <a href="{{ asset($order->bill_image) }}" target="_blank">
+                                                <img src="{{ asset($order->bill_image) }}" alt="Bill Image" width="50" height="50" class="img-thumbnail">
+                                            </a>
+                                        @else
+                                            <a href="{{ asset($order->bill_image) }}" target="_blank">View PDF</a>
+                                        @endif
                                     @else
-                                        No Image
+                                        No File
                                     @endif
                                 </td>
                                 <!-- Date -->
@@ -163,7 +172,7 @@
                             <label for="bill_image" class="form-label">Bill Image (Optional)</label>
                             <input type="file" name="bill_image" id="bill_image" class="form-control">
                             <small class="text-muted">Leave blank if not updating the image.</small>
-                            <img id="bill_image_preview" src="" width="50" height="50" class="img-thumbnail mt-2" style="display:none;">
+                            {{-- <img id="bill_image_preview" src="" width="50" height="50" class="img-thumbnail mt-2" style="display:none;"> --}}
                         </div>
                     </div>
 
@@ -226,11 +235,11 @@
                 $('#serial_no').val(response.serial_no);
                 $('#date_of_purchase').val(response.date_of_purchase);
 
-                if (response.bill_image) {
-                    $('#bill_image_preview').attr('src', `../${response.bill_image}`).show();
-                } else {
-                    $('#bill_image_preview').hide();
-                }
+                // if (response.bill_image) {
+                //     $('#bill_image_preview').attr('src', `../${response.bill_image}`).show();
+                // } else {
+                //     $('#bill_image_preview').hide();
+                // }
 
                 $('#editWarrantyForm').attr('action', `/warranty_registration/${id}`);
                 $('#editWarrantyModal').modal('show');

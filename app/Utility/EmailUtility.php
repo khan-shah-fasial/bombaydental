@@ -276,9 +276,14 @@ class EmailUtility
 
     // Not Approval Email 
     public static function warranty_reject_email($user){
+
+        $emailTemplate = EmailTemplate::whereIdentifier('warranty_reject_email')->first();
+
         $emailSendTo = $user->email;
-        $emailSubject = 'Your Warranty Has Not Been Approved by Admin';
-        $emailBody = 'Reason for not approval: '. nl2br($user->note);
+        $emailSubject = $emailTemplate->subject;
+
+        $emailBody = $emailTemplate->default_text;
+        $emailBody = str_replace('[[note]]', nl2br($user->note), $emailBody);
 
         $array['subject'] = $emailSubject;
         $array['content'] = $emailBody;
@@ -298,8 +303,14 @@ class EmailUtility
     // Approval Email 
     public static function warranty_approval_email($user){
         $emailSendTo = $user->email;
-        $emailSubject = 'Your Warranty Has Been Approved by Admin';
-        $emailBody = 'Your Warranty Has Been Approved.';
+
+        $emailTemplate = EmailTemplate::whereIdentifier('warranty_approval_email')->first();
+
+        $emailSendTo = $user->email;
+        $emailSubject = $emailTemplate->subject;
+
+        $emailBody = $emailTemplate->default_text;
+
         
         $array['subject'] = $emailSubject;
         $array['content'] = $emailBody;
