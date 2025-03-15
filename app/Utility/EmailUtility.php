@@ -275,8 +275,9 @@ class EmailUtility
 
 
     // Not Approval Email 
-    public static function warranty_reject_email($user){
+    public static function warranty_reject_email($registration){
 
+        $user = User::findMany($registration->user_id);
         $emailTemplate = EmailTemplate::whereIdentifier('warranty_reject_email')->first();
 
         $emailSendTo = $user->email;
@@ -301,7 +302,8 @@ class EmailUtility
 
 
     // Approval Email 
-    public static function warranty_approval_email($user){
+    public static function warranty_approval_email($registration){
+        $user = User::findMany($registration->user_id);
         $emailSendTo = $user->email;
 
         $emailTemplate = EmailTemplate::whereIdentifier('warranty_approval_email')->first();
