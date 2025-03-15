@@ -3022,3 +3022,34 @@ function custom_file($url)
 
     return 'public/' . $url;
 }
+
+
+function getLocationByPostalCode($postalCode)
+{
+    $country = 'In';
+    $username = 'umair.makent'; 
+    $url = 'https://secure.geonames.org/postalCodeSearchJSON?' . http_build_query([
+        'postalcode' => $postalCode,
+        'country'    => $country,
+        'username'   => $username,
+    ]);
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode == 200) {
+        $data = json_decode($response, true);
+        if (isset($data['postalCodes']) && count($data['postalCodes']) > 0) {
+            return [
+                'country' => $data['postalCodes'][0]['countryCode'] ?? null,
+                'city'    => $data['postalCodes'][0]['adminName2'] ?? null,
+                'state'   => $data['postalCodes'][0]['adminName1'] ?? null,
+            ];
+        }
+    }
+
+    return [];
+}

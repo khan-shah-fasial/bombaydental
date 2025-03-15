@@ -3,15 +3,15 @@
 @section('content')
     <div class="card">
         <div class="card-header">
-            <h5 class="mb-0 h6">{{ translate('Contacts') }}</h5>
+            <h5 class="mb-0 h6">{{ translate('Product Enquiry') }}</h5>
         </div>
-
         <form id="sort_warranties" action="" method="GET">
             <div class="card-header row gutters-5">
                 <div class="col">
-                    <h5 class="mb-md-0 h6">{{ translate('All Contacts') }}</h5>
+                    <h5 class="mb-md-0 h6">{{ translate('All Product Enquiry') }}</h5>
                 </div>
-                <input type="hidden" name="type" value="contact">
+    
+                <input type="hidden" name="type" value="product">
                 <div class="col-md-2">
                     <div class="form-group mb-0">
                         <label for="date_from" class="form-label">{{ translate('Search') }}</label>
@@ -45,16 +45,18 @@
                 </div>
             </div>
         </form>
-
         <div class="card-body">
             <table class="table aiz-table mb-0 " cellspacing="0" width="100%">
                 <thead>
                     <tr>
                         <th>#</th>
+                        <th>{{ translate('Product Name') }}</th>
                         <th>{{ translate('Name') }}</th>
                         <th >{{ translate('Email') }}</th>
                         <th data-breakpoints="lg">{{ translate('Phone') }}</th>
-                        <th data-breakpoints="lg">{{ translate('Query') }}</th>
+                        {{-- <th data-breakpoints="lg">{{ translate('Query') }}</th> --}}
+                        <th data-breakpoints="lg">{{ translate('Pincode') }}</th>
+                        <th data-breakpoints="lg">{{ translate('Url') }}</th>
                         <th data-breakpoints="lg">{{ translate('Date') }}</th>
                         {{-- <th data-breakpoints="lg">{{ translate('Reply') }}</th> --}}
                         {{-- <th>{{ translate('status') }}</th> --}}
@@ -65,10 +67,17 @@
                     @foreach ($contacts as $key => $contact)
                         <tr>
                             <td>{{ translate($key + 1) }}</td>
+                            <td>{{ $contact->product->name }}</td>
                             <td>{{ $contact->name }}</td>
                             <td>{{ $contact->email }}</td>
                             <td>{{ $contact->phone }}</td>
-                            <td>{{ Str::limit($contact->content, 100) }}</td>
+                            {{-- <td>{{ Str::limit($contact->content, 100) }}</td> --}}
+                            <td>{{ $contact->pincode }}</td>
+                            <td>
+                                <a href="{{ $contact->url }}" target="_blank">
+                                    {{ $contact->url }}
+                                </a>
+                            </td>
                             <td>{{ date('d-m-y', strtotime($contact->created_at)) }}</td>
                             {{-- <td>{{ Str::limit($contact->reply, 100) }}</td> --}}
                             {{-- <td>

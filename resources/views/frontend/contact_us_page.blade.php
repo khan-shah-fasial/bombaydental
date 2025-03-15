@@ -80,6 +80,7 @@
                                 @csrf
 
                                 <!-- Name -->
+                                <input type="hidden" class="form-control rounded-0" value="contacts" name="type">
                                 <div class="form-group">
                                     <label for="name" class="fs-14 fw-700 text-soft-dark">{{  translate('Name') }}</label>
                                     <input type="text" class="form-control rounded-0" value="{{ old('name') }}" placeholder="{{  translate('Enter Name') }}" name="name" required>

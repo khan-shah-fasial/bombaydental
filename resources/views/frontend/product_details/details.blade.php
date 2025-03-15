@@ -510,6 +510,9 @@
                         @if (Auth::check() || get_Setting('guest_checkout_activation') == 1) onclick="addToCart()" @else onclick="showLoginModal()" @endif>
                         <i class="la la-shopping-cart"></i> {{ translate('Buy Now') }}
                     </button>
+                    <button type="button" class="btn btn-primary product-enquiry-btn" data-product-id="{{ $detailedProduct->id }}">
+                        {{ translate('Product Enquiry') }}
+                    </button>
                 @endif
                 <button type="button" class="btn btn-secondary out-of-stock fw-600 d-none" disabled>
                     <i class="la la-cart-arrow-down"></i> {{ translate('Out of Stock') }}
@@ -523,6 +526,9 @@
                 <button type="button" class="btn btn-primary buy-now fw-600 add-to-cart min-w-150px rounded-0"
                     @if (Auth::check() || get_Setting('guest_checkout_activation') == 1) onclick="addToCart()" @else onclick="showLoginModal()" @endif>
                     <i class="la la-shopping-cart"></i> {{ translate('Buy Now') }}
+                </button>
+                <button type="button" class="btn btn-primary product-enquiry-btn" data-product-id="{{ $detailedProduct->id }}">
+                    {{ translate('Product Enquiry') }}
                 </button>
             @endif
         </div>
@@ -618,3 +624,103 @@
         </div>
     </div>
 </div>
+
+<!-- Product Enquiry Modal -->
+<div class="modal fade" id="productEnquiryModal" tabindex="-1" role="dialog" aria-labelledby="productEnquiryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+           <h5 class="modal-title" id="productEnquiryModalLabel">{{ translate('Product Enquiry') }}</h5>
+           <button type="button" class="close" data-dismiss="modal" aria-label="{{ translate('Close') }}">
+              <span aria-hidden="true">&times;</span>
+           </button>
+        </div>
+        <div class="modal-body">
+           <form id="product_enquiry_store" class="form-default" role="form" action="{{ route('product_enquiry_store') }}" method="POST">
+               @csrf
+               <!-- Hidden Fields -->
+               <input type="hidden" name="type" value="product">
+               <input type="hidden" name="product_id" id="enquiry_product_id" value="">
+               <input type="hidden" name="current_url" id="current_url" value="">
+               
+               <!-- Name -->
+               <div class="form-group">
+                   <label for="name" class="fs-14 fw-700 text-soft-dark">{{ translate('Name') }}</label>
+                   <input type="text" class="form-control rounded-0" placeholder="{{ translate('Enter Name') }}" name="name" required>
+               </div>
+               
+               <!-- Email -->
+               <div class="form-group">
+                   <label for="email" class="fs-14 fw-700 text-soft-dark">{{ translate('Email') }}</label>
+                   <input type="email" class="form-control rounded-0" placeholder="{{ translate('Enter Email') }}" name="email" required>
+               </div>
+               
+               <!-- Phone -->
+               <div class="form-group">
+                   <label for="phone" class="fs-14 fw-700 text-soft-dark">{{ translate('Phone no.') }}</label>
+                   <input type="tel" class="form-control rounded-0" placeholder="{{ translate('Enter Phone') }}" name="phone" required>
+               </div>
+               
+               <!-- Pincode -->
+               <div class="form-group">
+                   <label for="pincode" class="fs-14 fw-700 text-soft-dark">{{ translate('Pincode') }}</label>
+                   <input type="text" class="form-control rounded-0" placeholder="{{ translate('Enter Pincode') }}" name="pincode">
+               </div>
+               
+               {{-- <!-- Query -->
+               <div class="form-group">
+                   <label for="query" class="fs-14 fw-700 text-soft-dark">{{ translate('Tell us about your query') }}</label>
+                   <textarea class="form-control rounded-0" placeholder="{{ translate('Type here...') }}" name="content" rows="3" required></textarea>
+               </div> --}}
+               
+               <!-- Recaptcha (if enabled) -->
+               @if(get_setting('google_recaptcha') == 1)
+                   <div class="form-group">
+                       <div class="g-recaptcha" data-sitekey="{{ env('CAPTCHA_KEY') }}"></div>
+                   </div>
+                   @if ($errors->has('g-recaptcha-response'))
+                       <span class="invalid-feedback" role="alert" style="display: block;">
+                           <strong>{{ $errors->first('g-recaptcha-response') }}</strong>
+                       </span>
+                   @endif
+               @endif
+               
+               <!-- Submit Button -->
+               <div class="mt-4">
+                   {{-- @if (env('MAIL_USERNAME') == null && env('MAIL_PASSWORD') == null)
+                       <a class="btn btn-primary fw-700 fs-14 rounded-0 w-200px" href="javascript:void(1)" onclick="showWarning()">
+                           {{ translate('Submit') }}
+                       </a>
+                   @else
+                       <button type="submit" class="btn btn-primary fw-700 fs-14 rounded-0 w-200px">{{ translate('Submit') }}</button>
+                   @endif --}}
+                   <button type="submit" class="btn btn-primary fw-700 fs-14 rounded-0 w-200px">{{ translate('Submit') }}</button>
+               </div>
+           </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+@section('custom_script')
+  <script>
+        // Using jQuery
+        $(document).ready(function() {
+
+
+            initValidate(`#product_enquiry_store`);
+
+            $('.product-enquiry-btn').on('click', function() {
+                // Get the product_id from the button's data attribute
+                var productId = $(this).data('product-id');
+                // Set the value in the hidden input field inside the modal
+                $('#enquiry_product_id').val(productId);
+                // Set the current URL dynamically
+                $('#current_url').val(window.location.href);
+                // Show the modal
+                $('#productEnquiryModal').modal('show');
+            });
+        });
+    </script>
+@endsection
+

@@ -19,22 +19,33 @@
                 <td>{{ translate('Email') }}</td>
                 <td>{{ $contact->email }}</td>
             </tr>
-            <tr>
-                <td>{{ translate('Query') }}</td>
-                <td>{!! str_replace("\n", "<br>", $contact->content) !!}</td>
-            </tr>
-            <tr>
+            @if($contact->type == 'product')
+                <tr>
+                    <td>{{ translate('Product Name') }}</td>
+                    <td>{{ $contact->product->name }}</td>
+                </tr>
+                <tr>
+                    <td>{{ translate('Pincode') }}</td>
+                    <td>{{ $contact->pincode }}</td>
+                </tr>
+            @else
+                <tr>
+                    <td>{{ translate('Query') }}</td>
+                    <td>{!! str_replace("\n", "<br>", $contact->content) !!}</td>
+                </tr>
+            @endif
+            {{-- <tr>
                 <td>{{ translate('Reply') }}</td>
                 <td>{!! $contact->reply != null ? str_replace("\n", "<br>", $contact->reply) : translate('Not Replied Yet.') !!}</td>
-            </tr>
+            </tr> --}}
         </tbody>
     </table>
 </div>
 <div class="modal-footer">
-    @can('reply_to_contact')
+    {{-- @can('reply_to_contact')
         @if ($contact->reply == null)
             <a href="javascript:void(1)" onclick="showReplyModal({{ $contact->id }})" class="btn btn-primary">{{translate('Reply')}}</a>
         @endif
-    @endcan
+    @endcan --}}
     <button type="button" class="btn btn-light" data-dismiss="modal">{{translate('Cancel')}}</button>
 </div>

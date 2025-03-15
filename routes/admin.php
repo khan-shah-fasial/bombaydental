@@ -247,6 +247,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
     //Contacts
     Route::controller(ContactController::class)->group(function () {
         Route::get('/contacts', 'index')->name('contacts');
+        Route::get('/product-enquiry', 'product_enquiry_index')->name('product_enquiry');
+        Route::post('/product-enquiry-store', 'product_enquiry_store')->name('product_enquiry_store');
         Route::post('/contact/query_modal', 'query_modal')->name('contact.query_modal');
         Route::post('/contact/reply_modal', 'reply_modal')->name('contact.reply_modal');
         Route::post('/contact/reply', 'reply')->name('contact.reply');
